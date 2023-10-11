@@ -49,6 +49,7 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
         // -----------------------------------------------------------
         // CodeBuild Build Project
         // -----------------------------------------------------------
+        // Todo: roleは必要ない？？？？
         const role = new iam.Role(this, 'role', {
             assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com')
         });
