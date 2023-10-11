@@ -38,7 +38,7 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
             stageName: "Source",
             actions: [
                 new codepipeline_actions.CodeCommitSourceAction({
-                    actionName: "GitRepository",
+                    actionName: "SourceRepository",
                     repository: repository,
                     output: sourceOutput,
                     branch: "master"
@@ -69,7 +69,7 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
         // -----------------------------------------------------------
         const devOutput = new codepipeline.Artifact();
         const devAction = new codepipeline_actions.CodeBuildAction({
-            actionName: "Dev",
+            actionName: "DevBuild",
             project: cdkBuildProject,
             input: sourceOutput,
             outputs: [devOutput],
@@ -80,7 +80,7 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
             }
         });
         pipeline.addStage({
-            stageName: "Dev deploy",
+            stageName: "DevDeploy",
             actions: [devAction]
         });
 
@@ -99,7 +99,7 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
 
         const stgOutput = new codepipeline.Artifact();
         const stgAction = new codepipeline_actions.CodeBuildAction({
-            actionName: "Stg Deploy",
+            actionName: "StgBuild",
             project: cdkBuildProject,
             input: sourceOutput,
             outputs: [stgOutput],
@@ -110,7 +110,7 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
             }
         });
         pipeline.addStage({
-            stageName: "Stg",
+            stageName: "StgDeploy",
             actions: [stgAction]
         });
 
@@ -130,7 +130,7 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
 
         const prdOutput = new codepipeline.Artifact();
         const prdAction = new codepipeline_actions.CodeBuildAction({
-            actionName: "Prd Deploy",
+            actionName: "PrdBuild",
             project: cdkBuildProject,
             input: sourceOutput,
             outputs: [prdOutput],
@@ -141,8 +141,8 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
             }
         });
         pipeline.addStage({
-            stageName: "Prd",
-            actions: [stgAction]
+            stageName: "PrdDeploy",
+            actions: [prdAction]
         });
 
     }
