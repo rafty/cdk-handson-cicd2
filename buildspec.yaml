@@ -1,0 +1,19 @@
+version: '0.2'
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+  pre_build:
+    commands:
+      - npm install -g aws-cdk
+      - npm install
+  build:
+    commands:
+      - npm ci
+      - npm run build
+  post_build:
+    commands:
+      - npx cdk deploy "*" -c stage=$STAGE --require-approval never
+artifacts:
+  base-directory: cdk.out
+  files: "**/*"

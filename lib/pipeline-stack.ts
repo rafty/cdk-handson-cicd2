@@ -1,5 +1,9 @@
 import * as cdk from 'aws-cdk-lib';
 import * as codecommit from 'aws-cdk-lib/aws-codecommit';
+import * as codepipeline from 'aws-cdk-lib/aws-codepipeline';
+import * as codepipeline_actions from "aws-cdk-lib/aws-codepipeline-actions";
+import * as codebuild from "aws-cdk-lib/aws-codebuild";
+import * as iam from "aws-cdk-lib/aws-iam";
 import { Construct } from 'constructs';
 
 export class CdkHandsonPipelineStack extends cdk.Stack {
@@ -17,5 +21,138 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
             value: repository.repositoryCloneUrlHttp,
         });
 
+        // -----------------------------------------------------------
+        // CodePipeline Pipeline
+        // -----------------------------------------------------------
+        const pipeline = new codepipeline.Pipeline(this, "CdkHandsonPipeline2", {
+            pipelineName: "CdkHandsonPipeline2"
+        });
+        cdk.Tags.of(pipeline).add('Name', "CdkHandsonPipeline2");
+
+
+        // -----------------------------------------------------------
+        // CodePipeline Source Stage
+        // -----------------------------------------------------------
+        const sourceOutput = new codepipeline.Artifact();
+        pipeline.addStage({
+            stageName: "Source",
+            actions: [
+                new codepipeline_actions.CodeCommitSourceAction({
+                    actionName: "GitRepository",
+                    repository: repository,
+                    output: sourceOutput,
+                    branch: "master"
+                })
+            ]
+        });
+
+        // -----------------------------------------------------------
+        // CodeBuild Build Project
+        // -----------------------------------------------------------
+        const role = new iam.Role(this, 'role', {
+            assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com')
+        });
+        role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'));
+
+        const cdkBuildProject = new codebuild.PipelineProject(this, "CDK Build", {
+            buildSpec: codebuild.BuildSpec.fromSourceFilename('buildspec.yaml'),
+            environment: {
+                buildImage: codebuild.LinuxBuildImage.STANDARD_5_0,
+                privileged: true,
+                computeType: codebuild.ComputeType.LARGE,
+            },
+            role: role,
+        });
+
+        // -----------------------------------------------------------
+        // CodePipeline Dev Stage
+        // -----------------------------------------------------------
+        const devOutput = new codepipeline.Artifact();
+        const devAction = new codepipeline_actions.CodeBuildAction({
+            actionName: "Dev",
+            project: cdkBuildProject,
+            input: sourceOutput,
+            outputs: [devOutput],
+            environmentVariables: {
+                STAGE: {            // buildspec.yamlに指定する環境変数
+                    value: "dev",
+                }
+            }
+        });
+        pipeline.addStage({
+            stageName: "Dev deploy",
+            actions: [devAction]
+        });
+
+        // -----------------------------------------------------------
+        // CodePipeline Stg Stage
+        // -----------------------------------------------------------
+
+        // --- CodePipeline manual approval ---
+        const approval_action = new codepipeline_actions.ManualApprovalAction({
+            actionName: "Approve",
+        })
+        pipeline.addStage({
+            stageName: 'StgApproval',
+            actions: [approval_action]
+        })
+
+        const stgOutput = new codepipeline.Artifact();
+        const stgAction = new codepipeline_actions.CodeBuildAction({
+            actionName: "Stg Deploy",
+            project: cdkBuildProject,
+            input: sourceOutput,
+            outputs: [stgOutput],
+            environmentVariables: {
+                STAGE: {            // buildspec.yamlに指定する環境変数
+                    value: "stg",
+                }
+            }
+        });
+        pipeline.addStage({
+            stageName: "Stg",
+            actions: [stgAction]
+        });
+
+        // -----------------------------------------------------------
+        // CodePipeline prd Stage
+        // -----------------------------------------------------------
+
+        // --- CodePipeline manual approval ---
+        // これいらないよね！
+        // const approval_action = new codepipeline_actions.ManualApprovalAction({
+        //     actionName: "Approve",
+        // })
+        pipeline.addStage({
+            stageName: 'PrdApproval',
+            actions: [approval_action]
+        })
+
+        const prdOutput = new codepipeline.Artifact();
+        const prdAction = new codepipeline_actions.CodeBuildAction({
+            actionName: "Prd Deploy",
+            project: cdkBuildProject,
+            input: sourceOutput,
+            outputs: [prdOutput],
+            environmentVariables: {
+                STAGE: {            // buildspec.yamlに指定する環境変数
+                    value: "prd",
+                }
+            }
+        });
+        pipeline.addStage({
+            stageName: "Prd",
+            actions: [stgAction]
+        });
+
     }
 }
+
+
+
+
+
+
+
+
+
