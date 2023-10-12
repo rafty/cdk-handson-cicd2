@@ -49,7 +49,6 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
         // -----------------------------------------------------------
         // CodeBuild Build Project
         // -----------------------------------------------------------
-
         // 注) codebuildがcdk cliを実行する際、bootstrapなどにアクセス権限が必要になります。
         const role = new iam.Role(this, 'role', {
             assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com')
