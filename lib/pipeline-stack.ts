@@ -53,7 +53,7 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
         // const role = new iam.Role(this, 'role', {
         //     assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com')
         // });
-        role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'));
+        // role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'));
 
         const cdkBuildProject = new codebuild.PipelineProject(this, "CDK Build", {
             buildSpec: codebuild.BuildSpec.fromSourceFilename('buildspec.yaml'),
