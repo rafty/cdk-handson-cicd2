@@ -16,8 +16,9 @@ switch (stage) {
         // -----------------------------------------------------------
         // CDK Sample Application
         // -----------------------------------------------------------
-        const cdkAppStack = new CdkHandsonCicd2Stack(app, 'CdkHandsonCicd2Stack', {
-                stage: stage
+        const cdkAppStack = new CdkHandsonCicd2Stack(app, `CdkHandsonCicd2Stack${stage}`, {
+            env: stageVariables.env,
+            stage: stage
         });
         cdk.Tags.of(cdkAppStack).add('Name', "CdkHandsonCdkApp");
         break

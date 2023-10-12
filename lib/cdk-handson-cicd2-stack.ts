@@ -18,11 +18,11 @@ export class CdkHandsonCicd2Stack extends Stack {
       throw new Error("stage must be dev, stg, prd")
     }
 
-    const queue = new sqs.Queue(this, 'CdkHandsonCicd2Queue', {
+    const queue = new sqs.Queue(this, `CdkHandsonCicd2Queue`, {
       visibilityTimeout: Duration.seconds(300)
     });
 
-    const topic = new sns.Topic(this, 'CdkHandsonCicd2Topic');
+    const topic = new sns.Topic(this, `CdkHandsonCicd2Topic}`);
 
     topic.addSubscription(new subs.SqsSubscription(queue));
   }
