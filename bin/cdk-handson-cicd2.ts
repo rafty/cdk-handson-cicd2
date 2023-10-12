@@ -33,6 +33,3 @@ switch (stage) {
     default:
         throw new Error("The cdk context 'stage' must be either 'dev', 'stg', 'prd', or 'cicd'.");
 }
-
-// Todo: これ必要なかったっけ？
-// app.synth()
