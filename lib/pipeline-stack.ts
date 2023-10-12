@@ -62,7 +62,7 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
                 privileged: true,
                 computeType: codebuild.ComputeType.LARGE,
             },
-            // role: role,
+            // role: role,  // Todo: roleは必要ない？？？？
         });
 
         // -----------------------------------------------------------
