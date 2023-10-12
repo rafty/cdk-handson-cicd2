@@ -34,16 +34,16 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
         // CodePipeline Source Stage
         // -----------------------------------------------------------
         const sourceOutput = new codepipeline.Artifact();
+        const sourceAction = new codepipeline_actions.CodeCommitSourceAction({
+            actionName: "SourceRepository",
+            repository: repository,
+            output: sourceOutput,
+            branch: "master",
+        });
+
         pipeline.addStage({
             stageName: "Source",
-            actions: [
-                new codepipeline_actions.CodeCommitSourceAction({
-                    actionName: "SourceRepository",
-                    repository: repository,
-                    output: sourceOutput,
-                    branch: "master"
-                })
-            ]
+            actions: [sourceAction],
         });
 
         // -----------------------------------------------------------
@@ -90,7 +90,7 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
         // CodePipeline Stg Stage
         // -----------------------------------------------------------
 
-        // --- CodePipeline manual approval ---
+        // --- CodePipeline manual approval stage---
         const approval_action = new codepipeline_actions.ManualApprovalAction({
             actionName: "Approve",
         })
@@ -120,11 +120,7 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
         // CodePipeline prd Stage
         // -----------------------------------------------------------
 
-        // --- CodePipeline manual approval ---
-        // これいらないよね！
-        // const approval_action = new codepipeline_actions.ManualApprovalAction({
-        //     actionName: "Approve",
-        // })
+        // --- CodePipeline manual approval stage---
         pipeline.addStage({
             stageName: 'PrdApproval',
             actions: [approval_action]
