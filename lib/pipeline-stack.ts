@@ -50,9 +50,9 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
         // CodeBuild Build Project
         // -----------------------------------------------------------
         // Todo: roleは必要ない？？？？
-        const role = new iam.Role(this, 'role', {
-            assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com')
-        });
+        // const role = new iam.Role(this, 'role', {
+        //     assumedBy: new iam.ServicePrincipal('codebuild.amazonaws.com')
+        // });
         role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'));
 
         const cdkBuildProject = new codebuild.PipelineProject(this, "CDK Build", {
@@ -62,7 +62,7 @@ export class CdkHandsonPipelineStack extends cdk.Stack {
                 privileged: true,
                 computeType: codebuild.ComputeType.LARGE,
             },
-            role: role,
+            // role: role,
         });
 
         // -----------------------------------------------------------
