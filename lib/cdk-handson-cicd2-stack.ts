@@ -22,7 +22,7 @@ export class CdkHandsonCicd2Stack extends Stack {
       visibilityTimeout: Duration.seconds(300)
     });
 
-    const topic = new sns.Topic(this, `CdkHandsonCicd2Topic}`);
+    const topic = new sns.Topic(this, `CdkHandsonCicd2Topic`);
 
     topic.addSubscription(new subs.SqsSubscription(queue));
   }
